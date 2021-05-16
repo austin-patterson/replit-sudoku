@@ -2,21 +2,36 @@ import java.io.*;
 import java.util.*;
 
 class Main {
-  public static void main(String args[]) throws IOException {
+  public static void main(String args[]) {
     try{
-      BufferedReader test1 = new BufferedReader(new FileReader("./test1.sudoku"));
-      StringBuilder sb = new StringBuilder();
+      BufferedReader noBordersReader = new BufferedReader(new FileReader("./noBorders.test"));
+      BufferedReader bordersReader = new BufferedReader(new FileReader("./borders.test"));
+      BufferedReader solvedReader = new BufferedReader(new FileReader("./solved.test"));
+      StringBuilder sb = new StringBuilder('\n');
 
-      Sudoku sudoku = new Sudoku();
-      sudoku.parse(test1);
+      // Parse inputs and print them to console
+      Sudoku noBorders = new Sudoku();
+      noBorders.parse(noBordersReader);
+      sb.append("noBorders.test:\n\n").append(noBorders).append("\n\n");
 
-      sb.append(sudoku).append('\n');
+      Sudoku borders = new Sudoku();
+      borders.parse(bordersReader);
+      sb.append("borders.test:\n\n").append(borders).append("\n\n");
+
+      Sudoku solved = new Sudoku();
+      solved.parse(solvedReader);
+      sb.append("solved.test:\n\n").append(solved).append("\n\n");
+
+      // Solve and print
+      // sb.append("SOLVE 1:\n\n");
+      // Sudoku.solve(noBorders);
+      // Sudoku.printBoard(noBorders.getBoard(), sb);
+      sb.append("solved.test using Sudkou.printBoard():\n\n");
+      Sudoku.printBoard(solved, sb);
 
       System.out.println(sb);
-      Sudoku.printBoard(sudoku.getBlocks());
-
-    } catch (IOException e) {
-      System.err.println("FUCKED UP ------> " + e);
+    } catch (Exception e) {
+      System.err.println("\nFUCKED UP ------> " + e);
     }
   }
 }

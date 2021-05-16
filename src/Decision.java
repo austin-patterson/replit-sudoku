@@ -9,18 +9,39 @@ class Decision {
     this.val = val;
   }
 
-  public int getPos() { return this.pos; }
+  public int getPos() {
+    return this.pos;
+  }
 
-  public Sudoku getSudoku() { return this.sudoku; }
+  public Sudoku getSudoku() {
+    return this.sudoku;
+  }
 
   public boolean isValid() {
     boolean strike = false;
-      for (int num : this.sudoku.getBlock(pos)) {
-        if (num == this.val) {
-          if (!strike) strike = true;
-          else return false;
-        }
+    // Check block
+    for (int num : this.sudoku.getBlock(pos)) {
+      if (num == this.val) {
+        if (strike) return false;
+        strike = true;
       }
+    }
+    // Check row
+    strike = false;
+    for (int num : this.sudoku.getRow(this.pos)) {
+      if (num == this.val) {
+        if (strike) return false;
+        strike = true;
+      }
+    }
+    // Check row
+    strike = false;
+    for (int num : this.sudoku.getCol(this.pos)) {
+      if (num == this.val) {
+        if (strike) return false;
+        strike = true;
+      }
+    }
     return true;
   }
 }

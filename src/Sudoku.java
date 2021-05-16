@@ -11,19 +11,20 @@ class Sudoku {
   public Sudoku(Sudoku old) {
     this.board = Arrays.copyOf(old.getBoard(), 9);
   }
-  
+
   @Override
   public String toString() {
     StringBuilder s = new StringBuilder();
     int counter = 0;
-    for(int[] row : this.getRows()) {
-      for(int num : row) {
-        if (counter % 9 == 3 || counter % 9 == 6) s.append('|');
-        s.append(num);
+    for (int[] row : this.getRows()) {
+      for (int num : row) {
+        if (counter % 9 == 3 || counter % 9 == 6)
+          s.append("| ");
+        s.append(num).append(' ');
         counter++;
       }
       if (counter % 81 == 27 || counter % 81 == 54) {
-        s.append('\n').append("---+---+---");
+        s.append('\n').append("------+-------+------");
       }
       s.append('\n');
     }
@@ -34,41 +35,25 @@ class Sudoku {
   public int hashCode() {
     return super.hashCode();
   }
-  
+
   public int[][] getRows() {
     int[][] result = new int[9][9];
 
-    for(int i = 0; i <= 8; i++) {
+    for (int i = 0; i <= 8; i++) {
       result[i] = board[i];
     }
 
     return result;
   }
 
-  public static void printBoard(int[][] board) {
-    StringBuilder sb = new StringBuilder();
-    for(int[] block : board) {
-      sb.append("\t[ ");
-      for(int cell : block) {
-        sb.append(cell).append(" ");
-      }
-      sb.append("],").append('\n');
-    }
-    sb.append('\n');
-
-    System.out.println(sb);
-  }
-
   public int[][] getBoard() {
     return this.board;
   }
 
-  
-
   public int[][] getCols() {
     int[][] result = new int[9][9];
 
-    for(int i = 0; i < 81; i++) {
+    for (int i = 0; i < 81; i++) {
       result[i % 9][i / 9] = board[i / 9][i % 9];
     }
 
@@ -93,55 +78,15 @@ class Sudoku {
       } else if (pos != 0 && pos % 9 == 0) {
         row -= 2;
       }
-      
+
       // System.out.printf("pos: %d, row: %d, col: %d %n", pos, row, col);
       result[pos / 9][pos % 9] = board[row][col];
-      
+
       col++;
       pos++;
     }
 
     return result;
-  }
-
-  public void parse(BufferedReader in) throws IOException {
-    try {
-      String line = "";
-      int row = 0;
-      int col = 0;
-      // While not at end of .sudoku file
-      while ((line = in.readLine()) != null && !line.equals("") && row <= 8) {
-        for(char c : line.toCharArray()) {
-          // ASCII char to int 1-9
-          if (c == '.' || c == '0') board[row][col++] = (int)c - 46;
-          else if (Character.isDigit(c)) board[row][col++] = c - 48;
-        }
-        col = 0;
-        row++;
-      }
-    } catch (IOException e) {
-      System.err.println("FUCKED UP ====> " + e);
-    }
-  }
-
-  public static void solve(Sudoku sudoku) {
-    Decision next;
-    int pos = 0;
-    PriorityQueue<Decision> queue = new PriorityQueue<>();
-    queue.add(new Decision(sudoku, pos, (sudoku.get(pos) == 0) ? 1 : sudoku.get(pos)));
-
-    do {
-      next = queue.poll();
-      if (next.isValid()) {
-        // add combinations for next
-        for(int i = 0; i < 9; i++) {
-          queue.add(new Decision(next.getSudoku(), pos, i));
-        }
-      }
-    } while (queue.size() != 0 && pos < 81);
-    // Iterate through cells, top left to bottom right, until you reach a zero
-    // If blank, for each possible number 1-9, update board w/ value and pass
-    //   that new 
   }
 
   // 0 <= pos <= 80
@@ -156,15 +101,78 @@ class Sudoku {
   public int[] getRow(int pos) {
     return this.board[pos / 9];
   }
+
   public int[] getCol(int pos) {
     int[] result = new int[9];
-    for(int n : result) {
+    for (int n : result) {
       result[n] = board[pos / 9][pos % 9];
     }
     return result;
   }
+
   public int[] getBlock(int pos) {
-    int targetBlock = (pos / 27) + (pos % 9)/3;
+    int targetBlock = (pos / 27) + (pos % 9) / 3;
     return this.getBlocks()[targetBlock];
+  }
+
+  public static void printBoard(Sudoku s, StringBuilder sb) {
+    printBoard(s.getBoard(), sb);
+  }
+
+  public static void printBoard(int[][] board) {
+    StringBuilder sb = new StringBuilder();
+    printBoard(board, sb);
+    System.out.println(sb);
+  }
+
+  public static void printBoard(int[][] board, StringBuilder sb) {
+    for (int[] block : board) {
+      sb.append("[ ");
+      for (int cell : block) {
+        sb.append(cell).append(" ");
+      }
+      sb.append("]").append('\n');
+    }
+  }
+
+  public void parse(BufferedReader in) throws IOException {
+    try {
+      String line = "";
+      int row = 0;
+      int col = 0;
+      // While not at end of .sudoku file
+      while ((line = in.readLine()) != null && !line.equals("") && row <= 8) {
+        for (char c : line.toCharArray()) {
+          // ASCII char to int 1-9
+          if (c == '.' || c == '0')
+            board[row][col++] = (int) c - 46;
+          else if (Character.isDigit(c))
+            board[row][col++] = c - 48;
+        }
+        col = 0;
+        row++;
+      }
+    } catch (IOException e) {
+      System.err.println("FUCKED UP ====> " + e);
+    }
+  }
+
+// TODO
+  public static void solve(Sudoku sudoku) {
+    Decision next;
+    int pos = 0;
+    PriorityQueue<Decision> queue = new PriorityQueue<>();
+    queue.add(new Decision(sudoku, pos, (sudoku.get(pos) == 0) ? 1 : sudoku.get(pos)));
+
+    do {
+      next = queue.poll();
+      if (next.isValid()) {
+        // add combinations for next
+        for (int i = 0; i < 9; i++) {
+          queue.add(new Decision(next.getSudoku(), pos, i));
+        }
+        pos++;
+      }
+    } while (queue.size() > 0 && pos < 81);
   }
 }
